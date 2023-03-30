@@ -111,6 +111,13 @@ def create_annual_repurchase_curves(repurchase_curves, originations):
 
     return tmp
 
+def create_repuchase_counts_by_quarter_seller(repurchase_curves):
+    repurchase_count_by_quarter_seller = repurchase_curves.groupby(['REPURCHASE_QUARTER', 'SELLER'])[['LOAN_COUNT']].sum().reset_index()
+    quarter_seller_grid = expand_grid({'REPURCHASE_QUARTER': repurchase_count_by_quarter_seller['REPURCHASE_QUARTER'].unique(), 
+                                'SELLER': repurchase_count_by_quarter_seller['SELLER'].unique()})
+    repurchase_count_by_quarter_seller = quarter_seller_grid.merge(repurchase_count_by_quarter_seller, on = ['REPURCHASE_QUARTER', 'SELLER'], how='outer') \
+        .fillna(0)
+
 
 if __name__ == "__main__":
 
@@ -134,13 +141,16 @@ if __name__ == "__main__":
 
     repurchase_qtr_curves = create_quarterly_repurchase_curves(repurchase_curves, originations)
     repurchase_qtr_curves_recent = repurchase_qtr_curves[repurchase_qtr_curves['ORIG_QUARTER'] >= datetime.date(2020,6,1)]
-    repurchase_qtr_curves_recent.to_csv('C:\\Users\\DavidLeonard\\Documents\\d3\\repurchase_qtr_curves_recent.csv')
+    repurchase_qtr_curves_recent.to_csv('..\\web-app\\data\\repurchase_qtr_curves_recent.csv')
 
     quarterly_trailing_repurchase = create_quarterly_trailing_repurchase_rates(repurchase_qtr_curves)
-    quarterly_trailing_repurchase.to_csv('C:\\Users\\DavidLeonard\\Documents\\d3\\quarterly_trailing_repurchase.csv')
+    quarterly_trailing_repurchase.to_csv('..\\web-app\\data\\quarterly_trailing_repurchase.csv')
 
     repurchase_count_by_quarter = repurchase_qtr_curves.groupby('REPURCHASE_QUARTER')['LOAN_COUNT'].sum().reset_index()
-    repurchase_count_by_quarter.to_csv('C:\\Users\\DavidLeonard\\Documents\\d3\\repurchase_count_by_quarter.csv')
+    repurchase_count_by_quarter.to_csv('..\\web-app\\data\\repurchase_count_by_quarter.csv')
 
     annual_repurchase_curves = create_annual_repurchase_curves(repurchase_curves, originations)
-    annual_repurchase_curves.to_csv('C:\\Users\\DavidLeonard\\Documents\\d3\\annual_repurchase_curves.csv')
+    annual_repurchase_curves.to_csv('..\\web-app\\data\\annual_repurchase_curves.csv')
+
+    repuchase_counts_by_quarter_seller = create_repuchase_counts_by_quarter_seller(repurchase_curves)
+    repurchase_count_by_quarter_seller.to_csv('..\\web-app\\data\\repurchase_count_by_quarter_seller.csv')
