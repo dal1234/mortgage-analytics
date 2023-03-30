@@ -1,4 +1,11 @@
 import snowflake.connector
+import yaml
+
+
+with open("config.yaml", "r") as config_file:
+    config = yaml.load(config_file, Loader=yaml.FullLoader)
+
+database_config = config["database"]
 
 con = snowflake.connector.connect(
     user=database_config['user'],
@@ -11,6 +18,8 @@ con = snowflake.connector.connect(
 )
 
 cur = con.cursor()
+
+cur.execute("use schema fnma.public;")
 
 cur.execute("TRUNCATE TABLE IF EXISTS fnma;")
 

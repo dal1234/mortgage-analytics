@@ -1,0 +1,4 @@
+pandas==1.5.3
+PyYAML==6.0
+snowflake==0.0.3
+snowflake_connector_python==3.0.2
