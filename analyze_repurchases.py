@@ -36,17 +36,18 @@ def create_quarterly_trailing_repurchase_rates(repurchase_qtr_curves):
 
     df_sorted = repurchase_qtr_curves.sort_values(['REPURCHASE_QUARTER', 'LOAN_AGE_QTR'])
     df_sorted[['CUM_LOAN_COUNT', 'CUM_ORIG_LOAN_COUNT']] = df_sorted.groupby(['REPURCHASE_QUARTER'])[['LOAN_COUNT', 'ORIG_LOAN_COUNT']].cumsum()
+    df_sorted['rate'] = round(df_sorted['CUM_LOAN_COUNT'] / df_sorted['CUM_ORIG_LOAN_COUNT'] * 100, 3)
+    df_sorted['REPURCHASE_QTR'] = pd.to_datetime(df_sorted['REPURCHASE_QUARTER'], errors='coerce').dt.to_period('Q')
     df_sorted_filtered = df_sorted[df_sorted['LOAN_AGE_QTR'].isin([7,9,11])]
-    df_sorted_filtered['rate'] = round(df_sorted_filtered['CUM_LOAN_COUNT'] / df_sorted_filtered['CUM_ORIG_LOAN_COUNT'] * 100, 3)
+    
     df_sorted_filtered_recent = df_sorted_filtered[df_sorted_filtered['REPURCHASE_QUARTER'] >= datetime.date(2020,12,1)]
-
-    df_sorted_filtered_recent['REPURCHASE_QUARTER'] = pd.to_datetime(df_sorted_filtered_recent['REPURCHASE_QUARTER'], errors='coerce').dt.to_period('Q')
-
-    df_sorted_filtered_recent_pivot = pd.pivot(df_sorted_filtered_recent, index='REPURCHASE_QUARTER', columns='LOAN_AGE_QTR', values='rate').reset_index()
+    df_sorted_filtered_recent_pivot = pd.pivot(df_sorted_filtered_recent, index='REPURCHASE_QTR', columns='LOAN_AGE_QTR', values='rate').reset_index()
 
     df_sorted_filtered_recent_pivot.columns.values[1] = "qtr8"
     df_sorted_filtered_recent_pivot.columns.values[2] = "qtr10"
     df_sorted_filtered_recent_pivot.columns.values[3] = "qtr12"
+
+    df_sorted_filtered_recent_pivot.rename(columns = {'REPURCHASE_QTR': 'REPURCHASE_QUARTER'}, inplace=True)
 
     return df_sorted_filtered_recent_pivot
     
@@ -103,6 +104,8 @@ def create_annual_repurchase_curves(repurchase_curves, originations):
     # Fill in gaps
     periods = [6,12,24,36,48,54,63,72]
     df = expand_grid({'ORIG_YEAR': tmp['ORIG_YEAR'].unique(), 'LOAN_AGE': periods})
+    df = df.infer_objects()
+    tmp = tmp.infer_objects()
     tmp = df.merge(tmp, on = ['ORIG_YEAR', 'LOAN_AGE'], how = 'outer')
 
     # Clean up
