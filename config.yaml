@@ -1,0 +1,12 @@
+database:
+  user: ''
+  password: ''
+  account: ''
+  region: ''
+  warehouse: 'COMPUTE_WH'
+  database: 'fnma'
+  autocommit: True
+
+aws:
+  s3_bucket: 's3://fnma-data/'
+  storage_aws_role_arn: 'arn:aws:iam::<account-number>:role/snowflake_role'
