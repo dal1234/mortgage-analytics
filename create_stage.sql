@@ -2,7 +2,7 @@ CREATE STORAGE INTEGRATION s3_integration
   TYPE = EXTERNAL_STAGE
   STORAGE_PROVIDER = 'S3'
   ENABLED = TRUE
-  STORAGE_AWS_ROLE_ARN = 'arn:aws:iam::671181835860:role/snowflake_role'
+  STORAGE_AWS_ROLE_ARN = 'arn:aws:iam::<account-number>:role/snowflake_role'
   STORAGE_ALLOWED_LOCATIONS = ('s3://fnma-data/');
 
 DESC INTEGRATION s3_integration;
